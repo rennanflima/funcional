@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../templates/_Template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <!-- Modal de Aguarde... -->
+        <p:ajaxStatus onstart="statusDialog.show();" onsuccess="statusDialog.hide();"/>  
+
+        <p:dialog modal="true" widgetVar="statusDialog" header="Aguarde..."   
+                  draggable="false" closable="false" resizable="false">  
+            <p:graphicImage value="/resources/imgs/ajaxloadingbar.gif" />
+        </p:dialog>
+
+        <p:fieldset legend="Cadastro de Sub-Pilares 2">
+            <h:form id="formSubPilares2">
+                <p:growl id="aviso" life="5000" />
+
+                <br />
+                <br />
+                <!-- Botão Novo -->
+                <p:commandButton value="Novo Sub-Pilar 2" icon="ui-icon-document" action="#{subPilares2Bean.limpar()}" 
+                                 oncomplete="inserir.show()"/>
+                <br />
+                <br />
+                
+                <!-- Tabela de Exibição -->
+                <p:dataTable id="tabelaSubPilares2" value="#{subPilares2Bean.subpilares2}" var="sp2" rows="5" paginator="true"
+                             paginatorPosition="bottom" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} 
+                             {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" currentPageReportTemplate="{totalRecords} Reg./Pág. {currentPage} de {totalPages}"
+                             rowsPerPageTemplate="5,10,15" widgetVar="pilarTable" 
+                             emptyMessage="Não foram encontrados Sub-Pilares 2 cadastrados" >
+                
+                    <f:facet name="header">  
+                        <h:outputText value="LISTA DE SUB-PILARES 2" />  
+                    </f:facet>
+                    
+                    <p:column style="width: 18px">
+                        <p:commandLink id="deta" update=":detSubPilar2" oncomplete="detalhes.show()">
+                            <p:graphicImage alt="Detalhamento" style="border: none" value="/resources/imgs/search.png"/>
+                            <f:setPropertyActionListener value="#{sp2}" target="#{subPilares2Bean.subpilar2}"/>
+                        </p:commandLink>
+                        <p:tooltip for="deta" value="Exibe o detalhamento do Sub-Pilar 2" showEffect="fade" hideEffect="fade"/>
+                    </p:column>
+                    
+                    <p:column id="nomeColuna" sortBy="#{sp2.nome}">
+                        <f:facet name="header">
+                            <h:outputText value="NOME"/>
+                        </f:facet>
+                        #{sp2.nome}
+                    </p:column>
+                    
+                    <p:column width="300">
+                        <f:facet name="header">
+                            <h:outputText value="AÇÕES"/>
+                        </f:facet>
+                        <center>
+                            <p:commandButton value="Editar" icon="ui-icon-pencil" oncomplete="inserir.show()"
+                                             update=":cadastroSP2">
+                                <f:setPropertyActionListener value="#{sp2}" target="#{subPilares2Bean.subpilar2}"/>
+                            </p:commandButton>
+                            <p:commandButton value="Excluir" icon="ui-icon-trash" oncomplete="confirmation.show()">
+                                <f:setPropertyActionListener value="#{sp2}" target="#{subPilares2Bean.subpilar2}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:fieldset>
+        
+        <!-- Caixa de Confirmação de Exclusão -->
+        <p:confirmDialog id="confirmDialog" message="Tem certeza que deseja excluir ?"  
+                         header="Confirmação de exclusão" severity="alert" widgetVar="confirmation" closable="false">  
+            <h:form>
+                <p:commandButton id="confirm" value="Sim" oncomplete="confirmation.hide()"  
+                                 action="#{subPilares2Bean.excluir()}" update=":formSubPilares2:tabelaSubPilares2, :formSubPilares2:aviso">
+                </p:commandButton>  
+                <p:commandButton id="decline" value="Não" onclick="confirmation.hide()" action="#{subPilares2Bean.limpar()}"/>   
+            </h:form>
+        </p:confirmDialog>
+
+        <!-- Modal do Formulário -->
+        <p:dialog widgetVar="inserir" header="Inserir Sub-Pilares 1" width="600" resizable="false" modal="true">
+            <h:form id="cadastroSP2">
+                <h:inputHidden value="#{subPilares2Bean.subpilar2.idSubPilar2}"/>
+                <p:growl id="aviso2" life="5000"/>
+                <h:panelGrid columns="3" cellpadding="4" cellspacing="10">
+                    <p:outputLabel for="nome" value="Nome: "/>
+                    <p:inputText id="nome" required="true" value="#{subPilares2Bean.subpilar2.nome}" label="Nome" size="60" maxlength="60"
+                                 requiredMessage="O campo 'Nome' é obrigatório"
+                                 validatorMessage="É permitido apenas letras no campo 'Nome'">
+                        <f:validateRegex pattern="([A-Za-zÀ-ú ]+)"/>
+                    </p:inputText>
+                    <p:message id="msgNome" for="nome" display="icon"/>
+                    
+                    <p:outputLabel value="Sub-Pilar 1: " for="subpilar1"/>
+                    <p:selectOneMenu id="subpilar1" required="true" value="#{subPilares2Bean.idSubPilares1}" 
+                                     immediate="true" requiredMessage="O campo 'Sub-Pilar 1' é obrigatório">
+                        <f:selectItem itemLabel="Selecione uma Sub-Pilar 1..." itemValue="" /> 
+                        <f:selectItems value="#{subPilares1Bean.subpilares1}" var="sp1"
+                                       itemLabel="#{sp1.nome}" itemValue="#{sp1.idSubPilar1}" />
+                    </p:selectOneMenu>
+                    <p:message id="msgSubPilar1" for="subpilar1" display="icon"/>
+                </h:panelGrid>
+                <br />
+                <div style="float: left; font-size: 11px; font-weight:bold;">
+                    * Campos obrigatórios
+                </div>
+                <div style="float: right">
+                    <p:commandButton update=":formSubPilares2:tabelaSubPilares2, :formSubPilares2:aviso, cadastroSP2" value="Salvar" icon="ui-icon-disk" action="#{subPilares2Bean.salvar()}"/>
+                    <p:commandButton update="cadastroSP2" value="Limpar" action="#{subPilares2Bean.limpar()}" immediate="true" process="@this"/>
+                </div>
+            </h:form>
+            <p:ajax event="close" update="cadastroSP2" listener="#{subPilares2Bean.limpar()}"/>
+        </p:dialog>
+
+        <!-- Detalhamento do Pilar-->
+        <p:dialog id="det" widgetVar="detalhes" header="Detalhamento do Sub-Pilar 2" width="460" 
+                  modal="true" resizable="false" showEffect="clip" hideEffect="fold">
+
+            <h:panelGrid id="detSubPilar2" columns="2" cellpadding="4" cellspacing="10">
+
+                <h:outputText value="Nome: "/>
+                <h:outputText value="#{subPilares2Bean.subpilar2.nome}" style="font-weight:bold"/>
+
+                <h:outputText value="Sub-Pilar 1: "/>
+                <h:outputText value="#{subPilares2Bean.subpilar2.subPilar1.nome}" style="font-weight:bold"/>
+            </h:panelGrid>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

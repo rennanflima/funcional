@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../templates/_Template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <!-- Modal de Aguarde... -->
+        <p:ajaxStatus onstart="statusDialog.show();" onsuccess="statusDialog.hide();"/>  
+
+        <p:dialog modal="true" widgetVar="statusDialog" header="Aguarde..."   
+                  draggable="false" closable="false" resizable="false">  
+            <p:graphicImage value="/resources/imgs/ajaxloadingbar.gif" />
+        </p:dialog>
+
+        <p:fieldset legend="Cadastro de Pilares">
+            <h:form id="formPilares">
+                <p:growl id="aviso" life="5000" />
+
+                <br />
+                <br />
+                <!-- Botão Novo -->
+                <p:commandButton value="Novo Pilar" icon="ui-icon-document" action="#{pilaresBean.limpar()}" 
+                                 oncomplete="inserir.show()"/>
+                <br />
+                <br />
+                
+                <!-- Tabela de Exibição -->
+                <p:dataTable id="tabelaPilares" value="#{pilaresBean.pilares}" var="p" rows="5" paginator="true"
+                             paginatorPosition="bottom" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} 
+                             {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" currentPageReportTemplate="{totalRecords} Reg./Pág. {currentPage} de {totalPages}"
+                             rowsPerPageTemplate="5,10,15" widgetVar="pilarTable" 
+                             emptyMessage="Não foram encontrados Pilares cadastrados" >
+                
+                    <f:facet name="header">  
+                        <h:outputText value="LISTA DE PILARES" />  
+                    </f:facet>
+                    
+                    <p:column style="width: 18px">
+                        <p:commandLink id="deta" update=":detPilar" oncomplete="detalhes.show()">
+                            <p:graphicImage alt="Detalhamento" style="border: none" value="/resources/imgs/search.png"/>
+                            <f:setPropertyActionListener value="#{p}" target="#{pilaresBean.pilar}"/>
+                        </p:commandLink>
+                        <p:tooltip for="deta" value="Exibe o detalhamento do Pilar" showEffect="fade" hideEffect="fade"/>
+                    </p:column>
+                    
+                    <p:column id="nomeColuna" sortBy="#{p.nome}">
+                        <f:facet name="header">
+                            <h:outputText value="NOME"/>
+                        </f:facet>
+                        #{p.nome}
+                    </p:column>
+                    
+                    <p:column width="300">
+                        <f:facet name="header">
+                            <h:outputText value="AÇÕES"/>
+                        </f:facet>
+                        <center>
+                            <p:commandButton value="Editar" icon="ui-icon-pencil" oncomplete="inserir.show()"
+                                             update=":cadastroP">
+                                <f:setPropertyActionListener value="#{p}" target="#{pilaresBean.pilar}"/>
+                            </p:commandButton>
+                            <p:commandButton value="Excluir" icon="ui-icon-trash" oncomplete="confirmation.show()">
+                                <f:setPropertyActionListener value="#{p}" target="#{pilaresBean.pilar}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:fieldset>
+        
+        <!-- Caixa de Confirmação de Exclusão -->
+        <p:confirmDialog id="confirmDialog" message="Tem certeza que deseja excluir ?"  
+                         header="Confirmação de exclusão" severity="alert" widgetVar="confirmation" closable="false">  
+            <h:form>
+                <p:commandButton id="confirm" value="Sim" oncomplete="confirmation.hide()"  
+                                 action="#{pilaresBean.excluir()}" update=":formPilares:tabelaPilares, :formPilares:aviso">
+                </p:commandButton>  
+                <p:commandButton id="decline" value="Não" onclick="confirmation.hide()" action="#{pilaresBean.limpar()}"/>   
+            </h:form>
+        </p:confirmDialog>
+
+        <!-- Modal do Formulário -->
+        <p:dialog widgetVar="inserir" header="Inserir Pilares" width="600" resizable="false" modal="true">
+            <h:form id="cadastroP">
+                <h:inputHidden value="#{pilaresBean.pilar.idPilares}"/>
+                <p:growl id="aviso2" life="5000"/>
+                <h:panelGrid columns="3" cellpadding="4" cellspacing="10">
+                    <p:outputLabel for="nome" value="Nome: "/>
+                    <p:inputText id="nome" required="true" value="#{pilaresBean.pilar.nome}" label="Nome" size="60" maxlength="60"
+                                 requiredMessage="O campo 'Nome' é obrigatório"
+                                 validatorMessage="É permitido apenas letras no campo 'Nome'">
+                        <f:validateRegex pattern="([A-Za-zÀ-ú ]+)"/>
+                    </p:inputText>
+                    <p:message id="msgNome" for="nome" display="icon"/>
+                </h:panelGrid>
+                <br />
+                <div style="float: left; font-size: 11px; font-weight:bold;">
+                    * Campos obrigatórios
+                </div>
+                <div style="float: right">
+                    <p:commandButton update=":formPilares:tabelaPilares, :formPilares:aviso, cadastroP" value="Salvar" icon="ui-icon-disk" action="#{pilaresBean.salvar()}"/>
+                    <p:commandButton update="cadastroP" value="Limpar" action="#{pilaresBean.limpar()}" immediate="true" process="@this"/>
+                </div>
+            </h:form>
+            <p:ajax event="close" update="cadastroP" listener="#{pilaresBean.limpar()}"/>
+        </p:dialog>
+
+        <!-- Detalhamento do Pilar-->
+        <p:dialog id="det" widgetVar="detalhes" header="Detalhamento do Pilar" width="460" 
+                  modal="true" resizable="false" showEffect="clip" hideEffect="fold">
+
+            <h:panelGrid id="detPilar" columns="2" cellpadding="4" cellspacing="10">
+
+                <h:outputText value="Nome: "/>
+                <h:outputText value="#{pilaresBean.pilar.nome}" style="font-weight:bold"/>
+
+            </h:panelGrid>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+    <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+    <!--<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/funcionaldb?zeroDateTimeBehavior=convertToNull</property>-->
+    <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/funcionaldb</property>
+    <property name="hibernate.connection.username">root</property>
+    <property name="hibernate.connection.password"></property>
+    
+    <mapping class="br.com.sescacre.entidades.Pilares"/>
+    <mapping class="br.com.sescacre.entidades.SubPilares1"/>
+    <mapping class="br.com.sescacre.entidades.SubPilares2"/>
+    <mapping class="br.com.sescacre.entidades.Exercicios"/>
+    <mapping class="br.com.sescacre.entidades.Alunos"/>
+    <mapping class="br.com.sescacre.entidades.Cargos"/>
+    <mapping class="br.com.sescacre.entidades.Cidades"/>
+    <mapping class="br.com.sescacre.entidades.Estados"/>
+    <mapping class="br.com.sescacre.entidades.Enderecos"/>
+    <mapping class="br.com.sescacre.entidades.ExerciciosTreino"/>
+    <mapping class="br.com.sescacre.entidades.Professores"/>
+    <mapping class="br.com.sescacre.entidades.Setores"/>
+    <mapping class="br.com.sescacre.entidades.Treinos"/>
+    <mapping class="br.com.sescacre.entidades.Usuarios"/>
+    <mapping class="br.com.sescacre.entidades.Pessoa"/>
+  </session-factory>
+</hibernate-configuration>
