@@ -3,23 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package br.com.sescacre.entidades;
 
+import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 /**
  *
  * @author Rennan Francisco
  */
 @Entity
-public class Enderecos {
-    
+public class Enderecos implements Serializable {
+
     @Id
     @GeneratedValue
     private Integer idEndereco;
@@ -91,4 +94,51 @@ public class Enderecos {
     public void setCidade(Cidades cidade) {
         this.cidade = cidade;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + Objects.hashCode(this.idEndereco);
+        hash = 47 * hash + Objects.hashCode(this.logadouro);
+        hash = 47 * hash + Objects.hashCode(this.numero);
+        hash = 47 * hash + Objects.hashCode(this.complemento);
+        hash = 47 * hash + Objects.hashCode(this.bairro);
+        hash = 47 * hash + Objects.hashCode(this.cep);
+        hash = 47 * hash + Objects.hashCode(this.cidade);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Enderecos other = (Enderecos) obj;
+        if (!Objects.equals(this.idEndereco, other.idEndereco)) {
+            return false;
+        }
+        if (!Objects.equals(this.logadouro, other.logadouro)) {
+            return false;
+        }
+        if (!Objects.equals(this.numero, other.numero)) {
+            return false;
+        }
+        if (!Objects.equals(this.complemento, other.complemento)) {
+            return false;
+        }
+        if (!Objects.equals(this.bairro, other.bairro)) {
+            return false;
+        }
+        if (!Objects.equals(this.cep, other.cep)) {
+            return false;
+        }
+        if (!Objects.equals(this.cidade, other.cidade)) {
+            return false;
+        }
+        return true;
+    }
+
 }

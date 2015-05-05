@@ -54,7 +54,7 @@
                         #{p.nome}
                     </p:column>
                     
-                    <p:column width="300">
+                    <p:column style="width: 200px;">
                         <f:facet name="header">
                             <h:outputText value="AÇÕES"/>
                         </f:facet>
@@ -84,13 +84,13 @@
         </p:confirmDialog>
 
         <!-- Modal do Formulário -->
-        <p:dialog widgetVar="inserir" header="Inserir Pilares" width="600" resizable="false" modal="true">
+        <p:dialog widgetVar="inserir" header="Inserir Pilares" width="550" resizable="false" modal="true">
             <h:form id="cadastroP">
-                <h:inputHidden value="#{pilaresBean.pilar.idPilares}"/>
+                <h:inputHidden value="#{pilaresBean.pilar.idPilar}"/>
                 <p:growl id="aviso2" life="5000"/>
                 <h:panelGrid columns="3" cellpadding="4" cellspacing="10">
                     <p:outputLabel for="nome" value="Nome: "/>
-                    <p:inputText id="nome" required="true" value="#{pilaresBean.pilar.nome}" label="Nome" size="60" maxlength="60"
+                    <p:inputText id="nome" required="true" value="#{pilaresBean.pilar.nome}" label="Nome" size="80" maxlength="60"
                                  requiredMessage="O campo 'Nome' é obrigatório"
                                  validatorMessage="É permitido apenas letras no campo 'Nome'">
                         <f:validateRegex pattern="([A-Za-zÀ-ú ]+)"/>

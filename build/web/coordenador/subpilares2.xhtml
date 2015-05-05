@@ -27,18 +27,18 @@
                                  oncomplete="inserir.show()"/>
                 <br />
                 <br />
-                
+
                 <!-- Tabela de Exibição -->
                 <p:dataTable id="tabelaSubPilares2" value="#{subPilares2Bean.subpilares2}" var="sp2" rows="5" paginator="true"
                              paginatorPosition="bottom" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} 
                              {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" currentPageReportTemplate="{totalRecords} Reg./Pág. {currentPage} de {totalPages}"
                              rowsPerPageTemplate="5,10,15" widgetVar="pilarTable" 
                              emptyMessage="Não foram encontrados Sub-Pilares 2 cadastrados" >
-                
+
                     <f:facet name="header">  
                         <h:outputText value="LISTA DE SUB-PILARES 2" />  
                     </f:facet>
-                    
+
                     <p:column style="width: 18px">
                         <p:commandLink id="deta" update=":detSubPilar2" oncomplete="detalhes.show()">
                             <p:graphicImage alt="Detalhamento" style="border: none" value="/resources/imgs/search.png"/>
@@ -46,7 +46,7 @@
                         </p:commandLink>
                         <p:tooltip for="deta" value="Exibe o detalhamento do Sub-Pilar 2" showEffect="fade" hideEffect="fade"/>
                     </p:column>
-                    
+
                     <p:column id="nomeColuna" sortBy="#{sp2.nome}">
                         <f:facet name="header">
                             <h:outputText value="NOME"/>
@@ -54,7 +54,14 @@
                         #{sp2.nome}
                     </p:column>
                     
-                    <p:column width="300">
+                    <p:column id="subpilar1Coluna" sortBy="#{sp2.subPilar1.nome}">
+                        <f:facet name="header">
+                            <h:outputText value="SUB-PILAR 1"/>
+                        </f:facet>
+                        #{sp2.subPilar1.nome}
+                    </p:column>
+
+                    <p:column style="width: 200px;">
                         <f:facet name="header">
                             <h:outputText value="AÇÕES"/>
                         </f:facet>
@@ -71,7 +78,7 @@
                 </p:dataTable>
             </h:form>
         </p:fieldset>
-        
+
         <!-- Caixa de Confirmação de Exclusão -->
         <p:confirmDialog id="confirmDialog" message="Tem certeza que deseja excluir ?"  
                          header="Confirmação de exclusão" severity="alert" widgetVar="confirmation" closable="false">  
@@ -84,24 +91,32 @@
         </p:confirmDialog>
 
         <!-- Modal do Formulário -->
-        <p:dialog widgetVar="inserir" header="Inserir Sub-Pilares 1" width="600" resizable="false" modal="true">
+        <p:dialog widgetVar="inserir" header="Inserir Sub-Pilares 2" width="600" resizable="false" modal="true">
             <h:form id="cadastroSP2">
                 <h:inputHidden value="#{subPilares2Bean.subpilar2.idSubPilar2}"/>
                 <p:growl id="aviso2" life="5000"/>
                 <h:panelGrid columns="3" cellpadding="4" cellspacing="10">
                     <p:outputLabel for="nome" value="Nome: "/>
-                    <p:inputText id="nome" required="true" value="#{subPilares2Bean.subpilar2.nome}" label="Nome" size="60" maxlength="60"
-                                 requiredMessage="O campo 'Nome' é obrigatório"
-                                 validatorMessage="É permitido apenas letras no campo 'Nome'">
-                        <f:validateRegex pattern="([A-Za-zÀ-ú ]+)"/>
+                    <p:inputText id="nome" required="true" value="#{subPilares2Bean.subpilar2.nome}" label="Nome" size="80" maxlength="60"
+                                 requiredMessage="O campo 'Nome' é obrigatório">
                     </p:inputText>
                     <p:message id="msgNome" for="nome" display="icon"/>
-                    
+
+                    <p:outputLabel value="Pilar: " for="pilar"/>
+                    <p:selectOneMenu id="pilar" required="true" value="#{subPilares2Bean.idPilares}" 
+                                     immediate="true" requiredMessage="O campo 'Pilar' é obrigatório" filter="true" filterMatchMode="startsWith">
+                        <f:selectItem itemLabel="Selecione uma Pilar..." itemValue="" /> 
+                        <f:selectItems value="#{pilaresBean.pilares}" var="p"
+                                       itemLabel="#{p.nome}" itemValue="#{p.idPilar}" />
+                        <p:ajax update="subpilar1"/>
+                    </p:selectOneMenu>
+                    <p:message id="msgPilar" for="pilar" display="icon"/>
+
                     <p:outputLabel value="Sub-Pilar 1: " for="subpilar1"/>
                     <p:selectOneMenu id="subpilar1" required="true" value="#{subPilares2Bean.idSubPilares1}" 
-                                     immediate="true" requiredMessage="O campo 'Sub-Pilar 1' é obrigatório">
+                                     immediate="true" requiredMessage="O campo 'Sub-Pilar 1' é obrigatório" filter="true" filterMatchMode="startsWith">
                         <f:selectItem itemLabel="Selecione uma Sub-Pilar 1..." itemValue="" /> 
-                        <f:selectItems value="#{subPilares1Bean.subpilares1}" var="sp1"
+                        <f:selectItems value="#{subPilares2Bean.subpilares1}" var="sp1"
                                        itemLabel="#{sp1.nome}" itemValue="#{sp1.idSubPilar1}" />
                     </p:selectOneMenu>
                     <p:message id="msgSubPilar1" for="subpilar1" display="icon"/>
@@ -126,6 +141,9 @@
 
                 <h:outputText value="Nome: "/>
                 <h:outputText value="#{subPilares2Bean.subpilar2.nome}" style="font-weight:bold"/>
+                
+                <h:outputText value="Pilar: "/>
+                <h:outputText value="#{subPilares2Bean.subpilar2.subPilar1.pilar.nome}" style="font-weight:bold"/>
 
                 <h:outputText value="Sub-Pilar 1: "/>
                 <h:outputText value="#{subPilares2Bean.subpilar2.subPilar1.nome}" style="font-weight:bold"/>

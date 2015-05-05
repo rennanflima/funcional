@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package br.com.sescacre.entidades;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,8 +21,8 @@ import javax.persistence.Temporal;
  * @author Rennan Francisco
  */
 @Entity
-public class Treinos {
-    
+public class Treinos implements Serializable {
+
     @Id
     @GeneratedValue
     private Integer idTreino;
@@ -31,10 +32,10 @@ public class Treinos {
     private Date dataCad;
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date dataVenc;
-    private Date diaSemana;
+    private Integer diaSemana;
     @ManyToOne
     @JoinColumn(nullable = false)
-    private Professores professor = new Professores();
+    private Funcionarios professor = new Funcionarios();
     @ManyToOne
     @JoinColumn(nullable = false)
     private Alunos aluno = new Alunos();
@@ -71,19 +72,19 @@ public class Treinos {
         this.dataVenc = dataVenc;
     }
 
-    public Date getDiaSemana() {
+    public Integer getDiaSemana() {
         return diaSemana;
     }
 
-    public void setDiaSemana(Date diaSemana) {
+    public void setDiaSemana(Integer diaSemana) {
         this.diaSemana = diaSemana;
     }
 
-    public Professores getProfessor() {
+    public Funcionarios getProfessor() {
         return professor;
     }
 
-    public void setProfessor(Professores professor) {
+    public void setProfessor(Funcionarios professor) {
         this.professor = professor;
     }
 
@@ -93,5 +94,51 @@ public class Treinos {
 
     public void setAluno(Alunos aluno) {
         this.aluno = aluno;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.idTreino);
+        hash = 97 * hash + Objects.hashCode(this.status);
+        hash = 97 * hash + Objects.hashCode(this.dataCad);
+        hash = 97 * hash + Objects.hashCode(this.dataVenc);
+        hash = 97 * hash + Objects.hashCode(this.diaSemana);
+        hash = 97 * hash + Objects.hashCode(this.professor);
+        hash = 97 * hash + Objects.hashCode(this.aluno);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Treinos other = (Treinos) obj;
+        if (!Objects.equals(this.idTreino, other.idTreino)) {
+            return false;
+        }
+        if (!Objects.equals(this.status, other.status)) {
+            return false;
+        }
+        if (!Objects.equals(this.dataCad, other.dataCad)) {
+            return false;
+        }
+        if (!Objects.equals(this.dataVenc, other.dataVenc)) {
+            return false;
+        }
+        if (!Objects.equals(this.diaSemana, other.diaSemana)) {
+            return false;
+        }
+        if (!Objects.equals(this.professor, other.professor)) {
+            return false;
+        }
+        if (!Objects.equals(this.aluno, other.aluno)) {
+            return false;
+        }
+        return true;
     }
 }

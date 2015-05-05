@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package br.com.sescacre.entidades;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,7 +20,7 @@ import javax.persistence.ManyToOne;
  */
 @Entity
 public class SubPilares1 implements Serializable {
-    
+
     @Id
     @GeneratedValue
     private Integer idSubPilar1;
@@ -53,4 +53,35 @@ public class SubPilares1 implements Serializable {
     public void setPilar(Pilares pilar) {
         this.pilar = pilar;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + Objects.hashCode(this.idSubPilar1);
+        hash = 53 * hash + Objects.hashCode(this.nome);
+        hash = 53 * hash + Objects.hashCode(this.pilar);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SubPilares1 other = (SubPilares1) obj;
+        if (!Objects.equals(this.idSubPilar1, other.idSubPilar1)) {
+            return false;
+        }
+        if (!Objects.equals(this.nome, other.nome)) {
+            return false;
+        }
+        if (!Objects.equals(this.pilar, other.pilar)) {
+            return false;
+        }
+        return true;
+    }
+
 }

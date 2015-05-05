@@ -10,13 +10,43 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <h:outputStylesheet name="./css/default.css"/>
         <h:outputStylesheet name="./css/cssLayout.css"/>
+        <h:outputScript library="js" name="funcoes.js"/>
+        <script type="text/javascript">
+            PrimeFaces.locales['pt'] = {
+                closeText: 'OK',
+                prevText: 'Anterior',
+                nextText: 'Próximo',
+                currentText: 'Começo',
+                monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+                monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun', 'Jul','Ago','Set','Out','Nov','Des'],
+                dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+                dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+                dayNamesMin: ['D','S','T','Q','Q','S','S'],
+                weekHeader: 'Semana',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Só Horas',
+                timeText: 'Tempo',
+                hourText: 'Hora',
+                minuteText: 'Minuto',
+                secondText: 'Segundo',
+                currentText: 'Hora Atual',
+                ampm: false,
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia',
+                allDayText : 'Todo Dia'
+            };
+        </script>
         <title>Facelets Template</title>
     </h:head>
 
     <h:body>
 
         <div id="top">
-            
+
         </div>
         <div>
             <div id="left">
@@ -26,16 +56,22 @@
                             <p:menuitem value="Pilares" url="/coordenador/pilares.xhtml" icon="ui-icon-contact"/>
                             <p:menuitem value="Sub-Pilares 1" url="/coordenador/subpilares1.xhtml" icon="ui-icon-contact"/>
                             <p:menuitem value="Sub-Pilares 2" url="/coordenador/subpilares2.xhtml" icon="ui-icon-contact"/>
-                            <p:menuitem value="Exercícios" icon="ui-icon-contact"/>
-                            <p:menuitem value="Alunos" icon="ui-icon-contact"/>
-                            <p:menuitem value="Profesores" icon="ui-icon-contact"/>
-                            <p:menuitem value="Usuários" icon="ui-icon-contact"/>
+                            <p:menuitem value="Exercícios" url="/coordenador/exercicios.xhtml" icon="ui-icon-contact"/>
+                            <p:menuitem value="Alunos" url="/professor/alunos.xhtml" icon="ui-icon-contact"/>
+                            <p:menuitem value="Funcionários" icon="ui-icon-contact"/>
                         </p:submenu>
                         <p:submenu label="Serviços">
                             <p:menuitem value="Elaborar Treino"/>
                         </p:submenu>
                         <p:submenu label="Relatórios">
-                            
+
+                        </p:submenu>
+                        <p:submenu label="Configurações">
+                            <p:menuitem value="Setores" url="/admin/setores.xhtml" icon="ui-icon-contact"/>
+                            <p:menuitem value="Cargos" url="/admin/cargos.xhtml" icon="ui-icon-contact"/>
+                            <p:menuitem value="Estados" url="/admin/estados.xhtml" icon="ui-icon-contact"/>
+                            <p:menuitem value="Cidades" url="/admin/cidades.xhtml" icon="ui-icon-contact"/>
+                            <p:menuitem value="Pessoas" url="/admin/pessoas.xhtml" icon="ui-icon-contact"/>
                         </p:submenu>
                         <p:submenu label="Segurança">
                             <p:menuitem value="Trocar Senha" icon="ui-icon-gear"/>

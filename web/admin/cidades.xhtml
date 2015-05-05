@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../templates/_Template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <!-- Modal de Aguarde... -->
+        <p:ajaxStatus onstart="statusDialog.show();" onsuccess="statusDialog.hide();"/>  
+
+        <p:dialog modal="true" widgetVar="statusDialog" header="Aguarde..."   
+                  draggable="false" closable="false" resizable="false">  
+            <p:graphicImage value="/resources/imgs/ajaxloadingbar.gif" />
+        </p:dialog>
+
+        <p:fieldset legend="Cadastro de Cidades">
+            <h:form id="formCidades">
+                <p:growl id="aviso" life="5000" />
+
+                <br />
+                <br />
+                <!-- Botão Novo -->
+                <p:commandButton value="Nova Cidade" icon="ui-icon-document" action="#{cidadesBean.limpar()}" 
+                                 oncomplete="inserir.show()"/>
+                <br />
+                <br />
+                
+                <!-- Tabela de Exibição -->
+                <p:dataTable id="tabelaCidades" value="#{cidadesBean.cidades}" var="cid" rows="5" paginator="true"
+                             paginatorPosition="bottom" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} 
+                             {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" currentPageReportTemplate="{totalRecords} Reg./Pág. {currentPage} de {totalPages}"
+                             rowsPerPageTemplate="5,10,15" widgetVar="pilarTable" 
+                             emptyMessage="Não foram encontradas Cidades cadastradas" >
+                
+                    <f:facet name="header">  
+                        <h:outputText value="LISTA DE CIDADES" />  
+                    </f:facet>
+                    
+                    <p:column style="width: 18px">
+                        <p:commandLink id="deta" update=":detCidade" oncomplete="detalhes.show()">
+                            <p:graphicImage alt="Detalhamento" style="border: none" value="/resources/imgs/search.png"/>
+                            <f:setPropertyActionListener value="#{cid}" target="#{cidadesBean.cidade}"/>
+                        </p:commandLink>
+                        <p:tooltip for="deta" value="Exibe o detalhamento da Cidade" showEffect="fade" hideEffect="fade"/>
+                    </p:column>
+                    
+                    <p:column id="nomeColuna" sortBy="#{cid.nome}">
+                        <f:facet name="header">
+                            <h:outputText value="NOME"/>
+                        </f:facet>
+                        #{cid.nome}
+                    </p:column>
+                    
+                    <p:column id="pilarColuna" sortBy="#{cid.estado.sigla}">
+                        <f:facet name="header">
+                            <h:outputText value="ESTADO"/>
+                        </f:facet>
+                        #{cid.estado.sigla}
+                    </p:column>
+                    
+                    <p:column style="width: 200px;">
+                        <f:facet name="header">
+                            <h:outputText value="AÇÕES"/>
+                        </f:facet>
+                        <center>
+                            <p:commandButton value="Editar" icon="ui-icon-pencil" oncomplete="inserir.show()"
+                                             update=":cadastroC">
+                                <f:setPropertyActionListener value="#{cid}" target="#{cidadesBean.cidade}"/>
+                            </p:commandButton>
+                            <p:commandButton value="Excluir" icon="ui-icon-trash" oncomplete="confirmation.show()">
+                                <f:setPropertyActionListener value="#{cid}" target="#{cidadesBean.cidade}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:fieldset>
+        
+        <!-- Caixa de Confirmação de Exclusão -->
+        <p:confirmDialog id="confirmDialog" message="Tem certeza que deseja excluir ?"  
+                         header="Confirmação de exclusão" severity="alert" widgetVar="confirmation" closable="false">  
+            <h:form>
+                <p:commandButton id="confirm" value="Sim" oncomplete="confirmation.hide()"  
+                                 action="#{cidadesBean.excluir()}" update=":formCidades:tabelaCidades, :formCidades:aviso">
+                </p:commandButton>  
+                <p:commandButton id="decline" value="Não" onclick="confirmation.hide()" action="#{cidadesBean.limpar()}"/>   
+            </h:form>
+        </p:confirmDialog>
+
+        <!-- Modal do Formulário -->
+        <p:dialog widgetVar="inserir" header="Inserir Cidades" width="570" resizable="false" modal="true">
+            <h:form id="cadastroC">
+                <h:inputHidden value="#{cidadesBean.cidade.idCidade}"/>
+                <p:growl id="aviso2" life="5000"/>
+                <h:panelGrid columns="3" cellpadding="4" cellspacing="10">
+                    <p:outputLabel for="nome" value="Nome: "/>
+                    <p:inputText id="nome" required="true" value="#{cidadesBean.cidade.nome}" label="Nome" size="80" maxlength="60"
+                                 requiredMessage="O campo 'Nome' é obrigatório"
+                                 validatorMessage="É permitido apenas letras no campo 'Nome'">
+                        <f:validateRegex pattern="([A-Za-zÀ-ú ]+)"/>
+                    </p:inputText>
+                    <p:message id="msgNome" for="nome" display="icon"/>
+                    
+                    <p:outputLabel value="Estado: " for="estado"/>
+                    <p:selectOneMenu id="estado" required="true" value="#{cidadesBean.idEstado}" 
+                                     immediate="true" requiredMessage="O campo 'Estado' é obrigatório" filter="true" filterMatchMode="startsWith">
+                        <f:selectItem itemLabel="Selecione um Estado..." itemValue="" /> 
+                        <f:selectItems value="#{estadosBean.estados}" var="e"
+                                       itemLabel="#{e.nome}" itemValue="#{e.idEstado}" />
+                    </p:selectOneMenu>
+                    <p:message id="msgEstado" for="estado" display="icon"/>
+                    
+                    <p:outputLabel for="capital" value="É capital ?"/>
+                    <p:selectBooleanCheckbox id="capital" value="#{cidadesBean.cidade.capital}"/>
+                </h:panelGrid>
+                <br />
+                <div style="float: left; font-size: 11px; font-weight:bold;">
+                    * Campos obrigatórios
+                </div>
+                <div style="float: right">
+                    <p:commandButton update=":formCidades:tabelaCidades, :formCidades:aviso, cadastroC" value="Salvar" icon="ui-icon-disk" action="#{cidadesBean.salvar()}"/>
+                    <p:commandButton update="cadastroC" value="Limpar" action="#{cidadesBean.limpar()}" immediate="true" process="@this"/>
+                </div>
+            </h:form>
+            <p:ajax event="close" update="cadastroC" listener="#{cidadesBean.limpar()}"/>
+        </p:dialog>
+
+        <!-- Detalhamento do Pilar-->
+        <p:dialog id="det" widgetVar="detalhes" header="Detalhamento do Sub-Pilar 1" width="460" 
+                  modal="true" resizable="false" showEffect="clip" hideEffect="fold">
+
+            <h:panelGrid id="detCidade" columns="2" cellpadding="4" cellspacing="10">
+
+                <h:outputText value="Nome: "/>
+                <h:outputText value="#{cidadesBean.cidade.nome}" style="font-weight:bold"/>
+
+                <h:outputText value="Estado: "/>
+                <h:outputText value="#{cidadesBean.cidade.estado.nome}" style="font-weight:bold"/>
+                
+                <h:outputText value="É capital ?"/>
+                <h:outputText value="Sim" rendered="#{cidadesBean.cidade.capital eq true}" style="font-weight:bold"/>
+                <h:outputText value="Não" rendered="#{cidadesBean.cidade.capital eq false}" style="font-weight:bold"/>
+            </h:panelGrid>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

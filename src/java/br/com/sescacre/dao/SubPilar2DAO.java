@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package br.com.sescacre.dao;
 
 import br.com.sescacre.entidades.SubPilares2;
@@ -19,7 +18,7 @@ import org.hibernate.Transaction;
  * @author Rennan Francisco
  */
 public class SubPilar2DAO {
-    
+
     public void salvar(SubPilares2 sp2) throws Exception {
         Session s = HibernateUtil.getSession();
         try {
@@ -61,16 +60,20 @@ public class SubPilar2DAO {
         s.close();
         return lista;
     }
-    
-    public SubPilares2 pesquisaPorId (Integer id) {
+
+    public SubPilares2 pesquisaPorId(Integer id) {
         Session s = HibernateUtil.getSession();
-        return (SubPilares2) s.load(SubPilares2.class, id);
+        SubPilares2 sp2 = (SubPilares2) s.load(SubPilares2.class, id);
+        s.close();
+        return sp2;
     }
-    
+
     public List<SubPilares2> pesquisaSubPilar2PorSubPilar1(Integer id) {//join
         Session s = HibernateUtil.getSession();
         Query q = s.createQuery("from SubPilares2 sp2 where sp2.subPilar1.id = :subpilar1 order by sp2.nome");
         q.setParameter("subpilar1", id);
-        return q.list();
+        List<SubPilares2> lista = q.list();
+        s.close();
+        return lista;
     }
 }

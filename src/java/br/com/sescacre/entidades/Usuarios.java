@@ -3,76 +3,32 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package br.com.sescacre.entidades;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
 
 /**
  *
  * @author Rennan Francisco
  */
 @Entity
-public class Usuarios {
-    
+public class Usuarios implements Serializable{
+
     @Id
-    @GeneratedValue
-    private Integer idUsuarios;
-    @Column(nullable = false, unique = true)
-    private Integer matricula;
-    @Column(nullable = false, length = 60)
-    private String nome;
-    @Column(length = 40)
-    private String email;
     @Column(unique = true, length = 30)
     private String usuario;
     @Column(nullable = false, length = 45)
     private String senha;
     @Column(nullable = false, length = 60)
     private String autorizacao;
-    @ManyToOne
-    @JoinColumn
-    private Setores setor = new Setores();
-    @ManyToOne
-    @JoinColumn
-    private Cargos cargo = new Cargos();
-
-    public Integer getIdUsuarios() {
-        return idUsuarios;
-    }
-
-    public void setIdUsuarios(Integer idUsuarios) {
-        this.idUsuarios = idUsuarios;
-    }
-
-    public Integer getMatricula() {
-        return matricula;
-    }
-
-    public void setMatricula(Integer matricula) {
-        this.matricula = matricula;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    private Date ultimoAcesso;
 
     public String getUsuario() {
         return usuario;
@@ -98,20 +54,45 @@ public class Usuarios {
         this.autorizacao = autorizacao;
     }
 
-    public Setores getSetor() {
-        return setor;
+    public Date getUltimoAcesso() {
+        return ultimoAcesso;
     }
 
-    public void setSetor(Setores setor) {
-        this.setor = setor;
+    public void setUltimoAcesso(Date ultimoAcesso) {
+        this.ultimoAcesso = ultimoAcesso;
     }
 
-    public Cargos getCargo() {
-        return cargo;
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 19 * hash + Objects.hashCode(this.usuario);
+        hash = 19 * hash + Objects.hashCode(this.senha);
+        hash = 19 * hash + Objects.hashCode(this.autorizacao);
+        hash = 19 * hash + Objects.hashCode(this.ultimoAcesso);
+        return hash;
     }
 
-    public void setCargo(Cargos cargo) {
-        this.cargo = cargo;
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Usuarios other = (Usuarios) obj;
+        if (!Objects.equals(this.usuario, other.usuario)) {
+            return false;
+        }
+        if (!Objects.equals(this.senha, other.senha)) {
+            return false;
+        }
+        if (!Objects.equals(this.autorizacao, other.autorizacao)) {
+            return false;
+        }
+        if (!Objects.equals(this.ultimoAcesso, other.ultimoAcesso)) {
+            return false;
+        }
+        return true;
     }
-    
 }

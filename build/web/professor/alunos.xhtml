@@ -1,0 +1,391 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../templates/_Template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <!-- Modal de Aguarde... -->
+        <p:ajaxStatus onstart="statusDialog.show();" onsuccess="statusDialog.hide();"/>  
+
+        <p:dialog modal="true" widgetVar="statusDialog" header="Aguarde..."   
+                  draggable="false" closable="false" resizable="false">  
+            <p:graphicImage value="/resources/imgs/ajaxloadingbar.gif" />
+        </p:dialog>
+
+        <p:fieldset legend="Cadastro de Alunos">
+            <h:form id="formAlunos">
+                <p:growl id="aviso" life="5000" />
+
+                <br />
+                <br />
+                <!-- Botão Novo -->
+                <p:commandButton value="Novo Aluno" icon="ui-icon-document" action="#{alunosBean.limpar()}" 
+                                 oncomplete="inserirAluno.show()"/>
+                <br />
+                <br />
+
+                <!-- Tabela de Exibição -->
+                <p:dataTable id="tabelaAlunos" value="#{alunosBean.alunos}" var="a" rows="5" paginator="true"
+                             paginatorPosition="bottom" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} 
+                             {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" currentPageReportTemplate="{totalRecords} Reg./Pág. {currentPage} de {totalPages}"
+                             rowsPerPageTemplate="5,10,15" widgetVar="pilarTable" 
+                             emptyMessage="Não foram encontrados Alunos cadastrados" >
+
+                    <f:facet name="header">  
+                        <h:outputText value="LISTA DE ALUNOS" />  
+                    </f:facet>
+
+                    <p:column style="width: 18px">
+                        <p:commandLink id="deta" update=":detAluno" oncomplete="detalhes.show()">
+                            <p:graphicImage alt="Detalhamento" style="border: none" value="/resources/imgs/search.png"/>
+                            <f:setPropertyActionListener value="#{a}" target="#{alunosBean.aluno}"/>
+                        </p:commandLink>
+                        <p:tooltip for="deta" value="Exibe o detalhamento do Aluno" showEffect="fade" hideEffect="fade"/>
+                    </p:column>
+
+                    <p:column id="nomeColuna" sortBy="#{a.pessoa.nome}">
+                        <f:facet name="header">
+                            <h:outputText value="NOME"/>
+                        </f:facet>
+                        #{a.pessoa.nome}
+                    </p:column>
+
+                    <p:column width="300">
+                        <f:facet name="header">
+                            <h:outputText value="AÇÕES"/>
+                        </f:facet>
+                        <center>
+                            <p:commandButton value="Editar" icon="ui-icon-pencil" oncomplete="inserirAluno.show()"
+                                             update=":cadastroA">
+                                <f:setPropertyActionListener value="#{a}" target="#{alunosBean.aluno}"/>
+                            </p:commandButton>
+                            <p:commandButton value="Excluir" icon="ui-icon-trash" oncomplete="confirmation.show()">
+                                <f:setPropertyActionListener value="#{a}" target="#{alunosBean.aluno}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:fieldset>
+
+        <!-- Caixa de Confirmação de Exclusão -->
+        <p:confirmDialog id="confirmDialog" message="Tem certeza que deseja excluir ?"  
+                         header="Confirmação de exclusão" severity="alert" widgetVar="confirmation" closable="false">  
+            <h:form>
+                <p:commandButton id="confirm" value="Sim" oncomplete="confirmation.hide()"  
+                                 action="#{alunosBean.excluir()}" update=":formAlunos:tabelaAlunos, :formAlunos:aviso">
+                </p:commandButton>  
+                <p:commandButton id="decline" value="Não" onclick="confirmation.hide()" action="#{alunosBean.limpar()}"/>   
+            </h:form>
+        </p:confirmDialog>
+
+
+        <!-- Modal do Formulário do Aluno -->
+        <p:dialog widgetVar="inserirAluno" header="Inserir Alunos" width="550" resizable="false" modal="true" >
+            <h:form id="cadastroA">
+                <h:inputHidden value="#{alunosBean.aluno.idAluno}"/>
+                <p:growl id="aviso2" life="5000"/>
+                <h:panelGrid columns="3" cellpadding="4" cellspacing="10">
+                    <p:outputLabel for="pessoa" value="Aluno: "/>
+                    <p:autoComplete id="pessoa" required="true" value="#{alunosBean.pessoas}" label="Aluno" completeMethod="#{alunosBean.completePessoas}"
+                                    converter="pessoaConverter" var="pessoa" itemLabel="#{pessoa.nome}" size="50"
+                                    itemValue="#{pessoa}" forceSelection="true" immediate="true" requiredMessage="O campo 'Aluno' é obrigatório"
+                                    maxResults="5" effect="blind">
+                    </p:autoComplete>
+                    <h:panelGrid columns="2">
+                        <p:commandButton id="cad" icon="ui-icon-person" oncomplete="inserirCliente.show()">
+                            <p:tooltip for="cad" value="Cadastra/Edita Aluno" showEffect="fade" hideEffect="fade"/>
+                        </p:commandButton>
+                        <p:message id="msgNome" for="pessoa" display="icon"/>
+                    </h:panelGrid>
+
+                    <p:outputLabel for="nivel" value="Nível: "/>
+                    <p:selectOneRadio id="nivel" value="#{alunosBean.aluno.nivel}" required="true" label="Nível"
+                                      requiredMessage="O campo 'Nível' é obrigatório">
+                        <f:selectItem itemLabel="Iniciante" itemValue="Iniciante"/>
+                        <f:selectItem itemLabel="Intermediário" itemValue="Intermediário"/>
+                        <f:selectItem itemLabel="Avançado" itemValue="Avançado"/>
+                    </p:selectOneRadio>
+                    <p:message id="msgNivel" for="nivel" display="icon"/>
+
+                    <p:outputLabel for="qtdAulas" value="Aulas por Semana: "/>
+                    <p:panelGrid columns="1" style="margin-bottom: 10px">
+                        <p:inputText id="qtdAulas" value="#{alunosBean.aluno.qtdAulas}" required="true"
+                                     requiredMessage="O campo 'Aulas por Semana' é obrigatório"/>
+                        <p:slider for="qtdAulas" minValue="1" maxValue="7"/>
+                    </p:panelGrid>
+                    <p:message id="msgQtdAulas" for="qtdAulas" display="icon"/>
+                </h:panelGrid>
+
+                <p:fieldset legend="Responsável" rendered="false">
+                    <p:panelGrid columns="3" >
+                        <p:outputLabel for="nomeResp" value="Nome do Responsável: "/>
+                        <p:inputText id="nomeResp" required="false" value="#{alunosBean.aluno.respNome}" label="Nome do Responsável" size="60" maxlength="60"
+                                     requiredMessage="O campo 'Nome do Responsável' é obrigatório"
+                                     validatorMessage="É permitido apenas letras no campo 'Nome'">
+                            <f:validateRegex pattern="([A-Za-zÀ-ú ]+)"/>
+                        </p:inputText>
+                        <p:message id="msgNomeResp" for="nomeResp" display="icon"/>
+
+                        <p:outputLabel for="comResp" value="Telefone Comercial: "/>
+                        <p:inputMask id="comResp" value="#{alunosBean.aluno.comercialResp}" label="Telefone Comercial" mask="(99) 9999-9999"/>
+                        <p:message id="msgComResp" for="comResp" display="icon"/>
+
+                        <p:outputLabel for="foneResp" value="Telefone Residencial: "/>
+                        <p:inputMask id="foneResp" value="#{alunosBean.aluno.residencialResp}" label="Telefone Residencial" mask="(99) 9999-9999"/>
+                        <p:message id="msgFoneResp" for="foneResp" display="icon"/>
+
+                        <p:outputLabel for="celResp" value="Telefone Celular: " />
+                        <p:inputMask id="celResp" value="#{alunosBean.aluno.celularResp}" label="Telefone Celular" mask="(99) 9999-9999"
+                                     required="false" requiredMessage="O campo 'Telefone Celular' é obrigatório"/>
+                        <p:message id="msgCelResp" for="celResp" display="icon"/>
+                    </p:panelGrid>
+                </p:fieldset>
+
+                <br />
+                <div style="float: left; font-size: 11px; font-weight:bold;">
+                    * Campos obrigatórios
+                </div>
+                <div style="float: right">
+                    <p:commandButton update=":formAlunos:tabelaAlunos, :formAlunos:aviso, cadastroA" value="Salvar" icon="ui-icon-disk" action="#{alunosBean.salvar()}"/>
+                    <p:commandButton update="cadastroA" value="Limpar" action="#{alunosBean.limpar()}" immediate="true" process="@this"/>
+                </div>
+            </h:form>
+            <p:ajax event="close" update="cadastroP" listener="#{alunosBean.limpar()}"/>
+        </p:dialog>
+
+        <!-- Modal do Formulário do Cliente -->
+        <p:dialog widgetVar="inserirCliente" width="750" resizable="false" modal="true" showHeader="false">
+            <h:form id="cadastroP">
+                <p:tabView>
+                    <p:tab title="Dados Pessoais">
+                        <h:inputHidden value="#{pessoasBean.cliente.idPessoa}"/>
+                        <p:growl id="aviso3" life="5000"/>
+                        <h:panelGrid columns="3" cellpadding="4" cellspacing="10">
+
+                            <p:outputLabel for="carteira" value="Carteira do Sesc: "/>
+                            <p:inputMask id="carteira" value="#{pessoasBean.cliente.carteira}" label="Carteira do Sesc" mask="9999-999999-9"
+                                         required="true" requiredMessage="O campo 'Carteira do Sesc' é obrigatório"/>
+                            <p:message id="msgCarteira" for="carteira" display="icon"/>
+
+                            <p:outputLabel for="nome" value="Nome: "/>
+                            <p:inputText id="nome" required="true" value="#{pessoasBean.cliente.nome}" label="Nome" size="60" maxlength="60"
+                                         requiredMessage="O campo 'Nome' é obrigatório"
+                                         validatorMessage="É permitido apenas letras no campo 'Nome'">
+                                <f:validateRegex pattern="([A-Za-zÀ-ú ]+)"/>
+                            </p:inputText>
+                            <p:message id="msgNome" for="nome" display="icon"/>
+
+                            <p:outputLabel for="dtaNasc" value="Data de Nascimento: "/>
+                            <h:panelGrid columns="3" cellpadding="4" cellspacing="5">
+                                <h:panelGroup>
+                                    <p:inputMask id="dtaNasc" value="#{pessoasBean.cliente.dataNasc}" label="Data de Nascimento" mask="99/99/9999"
+                                                 size="20" required="true" requiredMessage="O campo 'Data de Nascimento' é obrigatório">
+                                        <f:convertDateTime type="date" pattern="dd/MM/yyyy" locale="pt_BR"/>
+                                    </p:inputMask>
+                                    <p:message id="msgdtaNasc" for="dtaNasc" display="icon"/>
+                                </h:panelGroup>
+
+                                <p:outputLabel for="sexo" value="Sexo: "/>
+                                <h:panelGroup>
+                                    <p:selectOneRadio id="sexo" value="#{pessoasBean.cliente.sexo}" required="true" label="Sexo"
+                                                      requiredMessage="O campo 'Sexo' é obrigatório">
+                                        <f:selectItem itemLabel="Masculino" itemValue="M"/>
+                                        <f:selectItem itemLabel="Feminino" itemValue="F"/>
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+
+                            </h:panelGrid>
+                            <p:message id="msgSexo" for="sexo" display="icon"/>
+
+                            <p:outputLabel for="estCivil" value="Estado Civil: "/>
+                            <p:selectOneMenu id="estCivil" required="true" value="#{pessoasBean.cliente.estadoCivil}" 
+                                             immediate="true" requiredMessage="O campo 'Estado Civil' é obrigatório">
+                                <f:selectItem itemLabel="Selecione um Estado Civil..." itemValue="" /> 
+                                <f:selectItem itemLabel="Solteiro(a)" itemValue="Solteiro" />
+                                <f:selectItem itemLabel="Casado(a)" itemValue="Casado" />
+                                <f:selectItem itemLabel="Viuvo(a)" itemValue="Viuvo" />
+                                <f:selectItem itemLabel="Divorciado(a)" itemValue="Divorciado" />
+                                <f:selectItem itemLabel="Separado(a)" itemValue="Separado" />
+
+                            </p:selectOneMenu>
+                            <p:message id="msgEstCivil" for="estCivil" display="icon"/>
+
+                            <p:outputLabel for="cpf" value="CPF: "/>
+                            <p:inputMask id="cpf" value="#{pessoasBean.cliente.cpf}" label="CPF" mask="999.999.999-99"
+                                         required="true" requiredMessage="O campo 'CPF' é obrigatório">
+                            </p:inputMask>
+                            <p:message id="msgCPF" for="cpf" display="icon"/>
+
+                            <p:outputLabel for="rg" value="RG: "/>
+                            <h:panelGrid columns="3" cellpadding="4" cellspacing="5">
+                                <h:panelGroup>
+                                    <p:inputText id="rg" required="true" value="#{pessoasBean.cliente.rg}" label="RG"
+                                                 size="20" maxlength="20" requiredMessage="O campo 'RG' é obrigatório"
+                                                 onkeypress="return SomenteNumero(event)" converterMessage="Digite apenas número no RG!">
+                                        <f:convertNumber integerOnly="true"/>
+                                    </p:inputText>
+                                    <p:message id="msgRG" for="rg" display="icon"/>
+                                </h:panelGroup>
+
+
+                                <p:outputLabel for="rg" value="Órgão Expedidor: "/>
+                                <h:panelGroup>
+                                    <p:inputText id="RGOrgExp" required="true" value="#{pessoasBean.cliente.rgOrgExp}" label="Órgão Expedidor" size="10" maxlength="10"
+                                                 requiredMessage="O campo 'Órgão Expedidor' é obrigatório">
+                                    </p:inputText>
+
+                                </h:panelGroup>
+                            </h:panelGrid>
+                            <p:message id="msgRGOrgExp" for="RGOrgExp" display="icon"/>
+                        </h:panelGrid>
+                    </p:tab>
+                    <p:tab title="Endereço">
+                        <h:panelGrid id="end" columns="2" cellpadding="4" cellspacing="10">
+                            <p:outputLabel for="cep" value="CEP: "/>
+                            <h:panelGroup>
+                                <p:inputMask id="cep" value="#{pessoasBean.cliente.endereco.cep}" label="CEP" mask="99.999-999"
+                                             required="true" requiredMessage="O campo 'CEP' é obrigatório">
+                                    <p:ajax event="blur" listener="#{pessoasBean.consultaCep()}" update="end"/>
+                                </p:inputMask>
+                                <p:message id="msgCEP" for="cep" display="icon"/>
+                            </h:panelGroup>
+
+                            <p:outputLabel for="logadouro" value="Logadouro: "/>
+                            <h:panelGrid columns="3" cellpadding="4" cellspacing="5">
+                                <h:panelGroup>
+                                    <p:inputText id="logadouro" required="true" value="#{pessoasBean.cliente.endereco.logadouro}" label="Nome" size="60" maxlength="60" 
+                                                 requiredMessage="O campo 'Logadouro' é obrigatório"/>
+                                    <p:message id="msgLogadouro" for="logadouro" display="icon"/>
+                                </h:panelGroup>
+
+
+                                <p:outputLabel for="num" value="Número: "/>
+                                <h:panelGroup>
+                                    <p:inputText id="num" required="true" value="#{pessoasBean.cliente.endereco.numero}" label="Número"
+                                                 size="10" maxlength="20" requiredMessage="O campo 'Número' é obrigatório"
+                                                 onkeypress="return SomenteNumero(event)" converterMessage="Digite apenas número no Número!">
+                                        <f:convertNumber integerOnly="true"/>
+                                    </p:inputText>
+                                    <p:message id="msgNum" for="num" display="icon"/>
+                                </h:panelGroup>
+                            </h:panelGrid>
+
+                            <p:outputLabel for="complemento" value="Complemento: "/>
+                            <h:panelGroup>
+                                <p:inputText id="complemento" value="#{pessoasBean.cliente.endereco.complemento}" label="Nome" size="60" maxlength="60"/>
+                                <p:message id="msgComplemento" for="complemento" display="icon"/>
+                            </h:panelGroup>
+
+                            <p:outputLabel for="bairro" value="Bairro: "/>
+                            <h:panelGroup>
+                                <p:inputText id="bairro" required="true" value="#{pessoasBean.cliente.endereco.bairro}" label="Nome" size="30" maxlength="60"
+                                             requiredMessage="O campo 'Bairro' é obrigatório">
+                                </p:inputText>
+                                <p:message id="msgBairro" for="bairro" display="icon"/>
+                            </h:panelGroup>
+
+                            <p:outputLabel value="Estado: " for="estado"/>
+                            <h:panelGroup>
+                                <p:selectOneMenu id="estado" required="true" value="#{pessoasBean.idEstado}" 
+                                                 immediate="true" requiredMessage="O campo 'Estado' é obrigatório">
+                                    <f:selectItem itemLabel="Selecione uma Estado..." itemValue="" /> 
+                                    <f:selectItems value="#{estadosBean.estados}" var="e"
+                                                   itemLabel="#{e.nome}" itemValue="#{e.idEstado}" />
+                                    <p:ajax update="cidade"/>
+                                </p:selectOneMenu>
+                                <p:message id="msgEstado" for="estado" display="icon"/>
+                            </h:panelGroup>
+
+                            <p:outputLabel value="Cidade: " for="cidade"/>
+                            <h:panelGroup>
+                                <p:selectOneMenu id="cidade" rendered="true" value="#{pessoasBean.idCidade}" 
+                                                 immediate="true" requiredMessage="O campo 'Cidade' é obrigatório">
+                                    <f:selectItem itemLabel="Selecione uma Cidade..." itemValue="" /> 
+                                    <f:selectItems value="#{pessoasBean.cidades}" var="cid"
+                                                   itemLabel="#{cid.nome}" itemValue="#{cid.idCidade}" />
+                                </p:selectOneMenu>
+                                <p:message id="msgCidade" for="cidade" display="icon"/>
+                            </h:panelGroup>
+                        </h:panelGrid>
+                    </p:tab>
+                    <p:tab title="Contato">
+                        <h:panelGrid columns="3" cellpadding="4" cellspacing="10">
+                            <!--Adicionar telefone-->
+                            <p:outputLabel for="com" value="Telefone Comercial: "/>
+                            <h:panelGroup>
+                                <p:inputMask id="com" value="#{pessoasBean.com}" label="Telefone Comercial" mask="(99) 9999-9999"/>
+                                <p:message id="msgCom" for="com" display="icon"/>
+                            </h:panelGroup>
+
+                            <!--Adicionar telefone-->
+                            <p:outputLabel for="fone" value="Telefone Residencial: "/>
+                            <h:panelGroup>
+                                <p:inputMask id="fone" value="#{pessoasBean.fone}" label="Telefone Residencial" mask="(99) 9999-9999"/>
+                                <p:message id="msgFone" for="fone" display="icon"/>
+                            </h:panelGroup>
+
+                            <!--Adicionar Celular-->
+                            <p:outputLabel for="cel" value="Telefone Celular: " />
+                            <h:panelGroup>
+                                <p:inputMask id="cel" value="#{pessoasBean.celular}" label="Telefone Celular" mask="(99) 9999-9999"
+                                             required="true" requiredMessage="O campo 'Telefone Celular' é obrigatório"/>
+                                <p:message id="msgCel" for="cel" display="icon"/>
+                            </h:panelGroup>
+
+                            <!--Adicionar E-mail-->
+                            <p:outputLabel for="email" value="E-mail: " />
+                            <h:panelGroup>
+                                <p:inputText id="email" value="#{pessoasBean.email}" required="true" label="E-mail" size="50" maxlength="40"
+                                             validatorMessage="O e-mail digitado não é valido!" requiredMessage="O campo 'E-mail' é obrigatório">
+                                    <f:validateRegex pattern="[\w\.-]*[a-zA-z0-9_]@[\w\.-]*[a-zA-z0-9]\.[a-zA-z][a-zA-Z\.]*[a-zA-Z]"/>
+                                </p:inputText>
+                                <p:message id="msgEmail" for="email" display="icon"/>
+                            </h:panelGroup>
+                        </h:panelGrid>
+                    </p:tab>
+                </p:tabView>
+                <br />
+                <div style="float: left; font-size: 11px; font-weight:bold;">
+                    * Campos obrigatórios
+                </div>
+                <div style="float: right">
+                    <p:commandButton update=":formAlunos:aviso, cadastroP" value="Salvar" icon="ui-icon-disk" action="#{pessoasBean.salvar()}"/>
+                    <p:commandButton update="cadastroP" value="Limpar" action="#{pessoasBean.limpar()}" immediate="true" process="@this"/>
+                    <p:commandButton update="cadastroP" value="Fechar" oncomplete="inserirCliente.hide()" action="#{pessoasBean.limpar()}" immediate="true" process="@this"/>
+                </div>
+            </h:form>
+
+        </p:dialog>
+
+        <!-- Detalhamento do Pilar-->
+        <p:dialog id="det" widgetVar="detalhes" header="Detalhamento do Aluno" width="460" 
+                  modal="true" resizable="false" showEffect="clip" hideEffect="fold">
+
+            <h:panelGrid id="detAluno" columns="2" cellpadding="4" cellspacing="10">
+
+                <h:outputText value="Nome: "/>
+                <h:outputText value="#{alunosBean.aluno.pessoa.nome}" style="font-weight:bold"/>
+                
+                <h:outputText value="Idade: "/>
+                <h:outputText value="#{alunosBean.aluno.pessoa.dataNasc}" style="font-weight:bold">
+                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                </h:outputText>
+                
+                <h:outputText value="Nível: "/>
+                <h:outputText value="#{alunosBean.aluno.nivel}" style="font-weight:bold"/>
+                
+                <h:outputText value="Aulas por Semana: "/>
+                <h:outputText value="#{alunosBean.aluno.qtdAulas}" style="font-weight:bold"/>
+
+
+            </h:panelGrid>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

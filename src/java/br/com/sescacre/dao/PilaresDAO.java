@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package br.com.sescacre.dao;
 
 import br.com.sescacre.entidades.Pilares;
@@ -19,7 +18,7 @@ import org.hibernate.Transaction;
  * @author Rennan Francisco
  */
 public class PilaresDAO {
-    
+
     public void salvar(Pilares p) throws Exception {
         Session s = HibernateUtil.getSession();
         try {
@@ -61,9 +60,11 @@ public class PilaresDAO {
         s.close();
         return lista;
     }
-    
-    public Pilares pesquisaPorId (Integer id) {
+
+    public Pilares pesquisaPorId(Integer id) {
         Session s = HibernateUtil.getSession();
-        return (Pilares) s.load(Pilares.class, id);
+        Pilares p = (Pilares) s.load(Pilares.class, id);
+        s.close();
+        return p;
     }
 }
